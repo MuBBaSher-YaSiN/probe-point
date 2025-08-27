@@ -14,7 +14,271 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      api_keys: {
+        Row: {
+          created_at: string
+          id: string
+          key_hash: string
+          label: string
+          last_used_at: string | null
+          revoked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key_hash: string
+          label: string
+          last_used_at?: string | null
+          revoked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key_hash?: string
+          label?: string
+          last_used_at?: string | null
+          revoked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          role: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      recommendations: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          docs_url: string | null
+          fix_steps: string | null
+          id: string
+          impact: string | null
+          potential_savings: number | null
+          test_run_id: string
+          title: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          docs_url?: string | null
+          fix_steps?: string | null
+          id?: string
+          impact?: string | null
+          potential_savings?: number | null
+          test_run_id: string
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          docs_url?: string | null
+          fix_steps?: string | null
+          id?: string
+          impact?: string | null
+          potential_savings?: number | null
+          test_run_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recommendations_test_run_id_fkey"
+            columns: ["test_run_id"]
+            isOneToOne: false
+            referencedRelation: "test_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sites: {
+        Row: {
+          created_at: string
+          default_device: string | null
+          default_region: string | null
+          id: string
+          label: string | null
+          tags: string[] | null
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          default_device?: string | null
+          default_region?: string | null
+          id?: string
+          label?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          default_device?: string | null
+          default_region?: string | null
+          id?: string
+          label?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      test_runs: {
+        Row: {
+          accessibility_score: number | null
+          best_practices_score: number | null
+          completed_at: string | null
+          created_at: string
+          cumulative_layout_shift: number | null
+          device: string | null
+          error_message: string | null
+          first_contentful_paint: number | null
+          id: string
+          largest_contentful_paint: number | null
+          performance_score: number | null
+          queued_at: string | null
+          raw_data: Json | null
+          region: string | null
+          seo_score: number | null
+          site_id: string | null
+          started_at: string | null
+          status: string | null
+          time_to_interactive: number | null
+          total_blocking_time: number | null
+          total_bytes: number | null
+          total_requests: number | null
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          accessibility_score?: number | null
+          best_practices_score?: number | null
+          completed_at?: string | null
+          created_at?: string
+          cumulative_layout_shift?: number | null
+          device?: string | null
+          error_message?: string | null
+          first_contentful_paint?: number | null
+          id?: string
+          largest_contentful_paint?: number | null
+          performance_score?: number | null
+          queued_at?: string | null
+          raw_data?: Json | null
+          region?: string | null
+          seo_score?: number | null
+          site_id?: string | null
+          started_at?: string | null
+          status?: string | null
+          time_to_interactive?: number | null
+          total_blocking_time?: number | null
+          total_bytes?: number | null
+          total_requests?: number | null
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          accessibility_score?: number | null
+          best_practices_score?: number | null
+          completed_at?: string | null
+          created_at?: string
+          cumulative_layout_shift?: number | null
+          device?: string | null
+          error_message?: string | null
+          first_contentful_paint?: number | null
+          id?: string
+          largest_contentful_paint?: number | null
+          performance_score?: number | null
+          queued_at?: string | null
+          raw_data?: Json | null
+          region?: string | null
+          seo_score?: number | null
+          site_id?: string | null
+          started_at?: string | null
+          status?: string | null
+          time_to_interactive?: number | null
+          total_blocking_time?: number | null
+          total_bytes?: number | null
+          total_requests?: number | null
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_runs_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
