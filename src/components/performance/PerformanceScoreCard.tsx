@@ -14,9 +14,9 @@ interface PerformanceScoreCardProps {
 }
 
 const getScoreColor = (score: number) => {
-  if (score >= 90) return 'success';
-  if (score >= 50) return 'warning';
-  return 'error';
+  if (score >= 90) return 'excellent';
+  if (score >= 50) return 'good';
+  return 'poor';
 };
 
 const getScoreGrade = (score: number) => {
