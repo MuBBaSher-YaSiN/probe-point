@@ -114,7 +114,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, loading = fal
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@probe-point.app"
+                placeholder="iqraf2001@gmail.com"
                 {...register('email')}
               />
               {errors.email && (
@@ -152,7 +152,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, loading = fal
 
             <div className="text-sm text-muted-foreground text-center space-y-1">
               <p><strong>Default Credentials:</strong></p>
-              <p>Email: admin@probe-point.app</p>
+              <p>Email: iqraf2001@gmail.com</p>
               <p>Password: password</p>
             </div>
           </form>

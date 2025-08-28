@@ -16,7 +16,7 @@
  */
 
 export const ADMIN = {
-  EMAIL: process.env.ADMIN_EMAIL ?? "admin@probe-point.app",
+  EMAIL: process.env.ADMIN_EMAIL ?? "iqraf2001@gmail.com",
   PASSWORD_HASH: process.env.ADMIN_PASSWORD_HASH ?? "$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", // Default: "password"
 } as const;
 
