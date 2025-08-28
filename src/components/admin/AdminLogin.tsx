@@ -53,7 +53,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, loading = fal
           // If admin account doesn't exist, create it
           if (signInError.message.includes('Invalid login credentials')) {
             const { error: signUpError } = await supabase.auth.signUp({
-              email: 'admin@probe-point.app',
+              email: 'iqraf2001@gmail.com',
               password: 'probepoint2025',
               options: {
                 data: {
