@@ -30,6 +30,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, loading = fal
   const handleAdminLogin = async (formData: AdminLoginData) => {
     setIsLogging(true);
     try {
+      // First authenticate with admin-auth edge function
       const { data, error } = await supabase.functions.invoke('admin-auth', {
         body: {
           email: formData.email,
@@ -42,6 +43,41 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, loading = fal
       }
 
       if (data.success) {
+        // Now sign in the user through Supabase auth using a special admin account
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: 'admin@probe-point.app',
+          password: 'probepoint2025'
+        });
+
+        if (signInError) {
+          // If admin account doesn't exist, create it
+          if (signInError.message.includes('Invalid login credentials')) {
+            const { error: signUpError } = await supabase.auth.signUp({
+              email: 'admin@probe-point.app',
+              password: 'probepoint2025',
+              options: {
+                data: {
+                  full_name: 'System Administrator',
+                  role: 'admin'
+                }
+              }
+            });
+            
+            if (signUpError) {
+              throw new Error('Failed to create admin account: ' + signUpError.message);
+            }
+            
+            toast({
+              title: 'Admin Account Created',
+              description: 'Please check your email to confirm the account, then try logging in again.',
+              variant: 'default',
+            });
+            return;
+          } else {
+            throw new Error('Sign in failed: ' + signInError.message);
+          }
+        }
+
         toast({
           title: 'Welcome, Admin!',
           description: 'You have been successfully authenticated.',

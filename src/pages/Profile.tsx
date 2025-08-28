@@ -19,7 +19,8 @@ import {
   Eye,
   EyeOff,
   Trash2,
-  Plus
+  Plus,
+  Globe
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -413,6 +414,9 @@ const Profile: React.FC = () => {
                     Generate New Key
                   </Button>
                 </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Generate API keys for programmatic access to performance testing endpoints.
+                </p>
               </CardHeader>
               <CardContent className="space-y-4">
                 {showNewApiKey && (
@@ -522,6 +526,45 @@ const Profile: React.FC = () => {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* API Usage Documentation */}
+            <Card className="score-card border-info/20 bg-info/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-info">
+                  <Globe className="w-5 h-5" />
+                  API Usage Guide
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="font-medium text-sm mb-2">Run Performance Test</h4>
+                    <div className="bg-muted/50 p-3 rounded text-xs font-mono space-y-2">
+                      <div>POST {window.location.origin.replace('https://', 'https://').replace('http://', 'https://')}/functions/v1/api-test</div>
+                      <div>Headers: x-api-key: YOUR_API_KEY</div>
+                      <div>Body: {`{"url": "https://example.com", "device": "mobile", "region": "us"}`}</div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-sm mb-2">Example Response</h4>
+                    <div className="bg-muted/50 p-3 rounded text-xs font-mono">
+                      {`{
+  "success": true,
+  "test_run_id": "uuid-here",
+  "status": "queued"
+}`}
+                    </div>
+                  </div>
+                  
+                  <div className="text-xs text-muted-foreground">
+                    <p>• Generate API keys above to get programmatic access</p>
+                    <p>• Keys are validated on each request and usage is tracked</p>
+                    <p>• Revoked keys will immediately stop working</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
