@@ -36,13 +36,15 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [testLoading, setTestLoading] = useState(false);
 
+  useEffect(() => {
+    if (user) {
+      loadRecentTests();
+    }
+  }, [user]);
+
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
-
-  useEffect(() => {
-    loadRecentTests();
-  }, []);
 
   const loadRecentTests = async () => {
     setLoading(true);

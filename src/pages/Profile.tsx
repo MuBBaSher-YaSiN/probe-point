@@ -57,14 +57,16 @@ const Profile: React.FC = () => {
   const [showNewApiKey, setShowNewApiKey] = useState(false);
   const [generatedApiKey, setGeneratedApiKey] = useState('');
 
+  useEffect(() => {
+    if (user) {
+      loadProfile();
+      loadApiKeys();
+    }
+  }, [user]);
+
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
-
-  useEffect(() => {
-    loadProfile();
-    loadApiKeys();
-  }, []);
 
   const loadProfile = async () => {
     try {
