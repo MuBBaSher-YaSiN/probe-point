@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { testFormSchema, TestFormData } from '@/schemas/validation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,14 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Globe, Smartphone, Monitor, Play } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-const testSchema = z.object({
-  url: z.string().url('Please enter a valid URL'),
-  device: z.enum(['mobile', 'desktop']),
-  region: z.string().min(1, 'Please select a region'),
-});
-
-type TestFormData = z.infer<typeof testSchema>;
 
 interface PerformanceTestFormProps {
   onSubmit: (data: TestFormData) => Promise<void>;
@@ -37,7 +29,7 @@ export const PerformanceTestForm: React.FC<PerformanceTestFormProps> = ({
     setValue,
     watch,
   } = useForm<TestFormData>({
-    resolver: zodResolver(testSchema),
+    resolver: zodResolver(testFormSchema),
     defaultValues: {
       device: 'mobile',
       region: 'us',

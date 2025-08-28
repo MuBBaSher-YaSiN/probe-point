@@ -68,7 +68,8 @@ export class PDFExporter {
     ];
 
     scores.forEach(score => {
-      pdf.setTextColor(...score.color);
+      const [r, g, b] = score.color;
+      pdf.setTextColor(r, g, b);
       pdf.text(`${score.label}: ${score.value}/100`, 20, yPos);
       yPos += 8;
     });
@@ -127,11 +128,16 @@ export class PDFExporter {
       }
       
       // Impact badge
-      const impactColor = rec.impact === 'high' ? [220, 53, 69] : 
-                         rec.impact === 'medium' ? [255, 193, 7] : [40, 167, 69];
+      const impactColors = {
+        high: [220, 53, 69] as [number, number, number],
+        medium: [255, 193, 7] as [number, number, number], 
+        low: [40, 167, 69] as [number, number, number]
+      };
+      const impactColor = impactColors[rec.impact];
       
       pdf.setFontSize(12);
-      pdf.setTextColor(...impactColor);
+      const [r, g, b] = impactColor;
+      pdf.setTextColor(r, g, b);
       pdf.text(`[${rec.impact.toUpperCase()}]`, 20, yPos);
       
       // Title

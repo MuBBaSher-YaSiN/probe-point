@@ -17,24 +17,22 @@ export class JobQueue {
   private static readonly RETRY_DELAY = 1000; // 1 second
 
   static async enqueue(type: string, payload: Record<string, any>): Promise<string> {
-    const job: Partial<JobData> = {
-      type: type as any,
-      payload,
-      status: 'queued',
-      attempts: 0,
-      maxAttempts: this.MAX_ATTEMPTS,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    try {
+      const { data, error } = await supabase.functions.invoke('job-queue', {
+        body: { 
+          action: 'enqueue', 
+          type, 
+          payload,
+          maxAttempts: this.MAX_ATTEMPTS 
+        }
+      });
 
-    const { data, error } = await supabase
-      .from('jobs')
-      .insert(job)
-      .select('id')
-      .single();
-
-    if (error) throw error;
-    return data.id;
+      if (error) throw error;
+      return data.jobId;
+    } catch (error) {
+      console.error('Failed to enqueue job:', error);
+      throw error;
+    }
   }
 
   static async updateJobStatus(
@@ -42,69 +40,72 @@ export class JobQueue {
     status: JobData['status'], 
     error?: string
   ): Promise<void> {
-    const updates: Partial<JobData> = {
-      status,
-      updatedAt: new Date(),
-    };
+    try {
+      const { error: updateError } = await supabase.functions.invoke('job-queue', {
+        body: { 
+          action: 'updateStatus', 
+          jobId, 
+          status, 
+          error 
+        }
+      });
 
-    if (error) {
-      updates.error = error;
+      if (updateError) throw updateError;
+    } catch (error) {
+      console.error('Failed to update job status:', error);
+      throw error;
     }
-
-    if (status === 'running') {
-      // Increment attempts when starting
-      const { data: currentJob } = await supabase
-        .from('jobs')
-        .select('attempts')
-        .eq('id', jobId)
-        .single();
-      
-      if (currentJob) {
-        updates.attempts = currentJob.attempts + 1;
-      }
-    }
-
-    const { error: updateError } = await supabase
-      .from('jobs')
-      .update(updates)
-      .eq('id', jobId);
-
-    if (updateError) throw updateError;
   }
 
   static async getJob(jobId: string): Promise<JobData | null> {
-    const { data, error } = await supabase
-      .from('jobs')
-      .select('*')
-      .eq('id', jobId)
-      .single();
+    try {
+      const { data, error } = await supabase.functions.invoke('job-queue', {
+        body: { 
+          action: 'getJob', 
+          jobId 
+        }
+      });
 
-    if (error) return null;
-    return data;
+      if (error) throw error;
+      return data.job || null;
+    } catch (error) {
+      console.error('Failed to get job:', error);
+      return null;
+    }
   }
 
   static async getPendingJobs(limit: number = 10): Promise<JobData[]> {
-    const { data, error } = await supabase
-      .from('jobs')
-      .select('*')
-      .eq('status', 'queued')
-      .order('createdAt', { ascending: true })
-      .limit(limit);
+    try {
+      const { data, error } = await supabase.functions.invoke('job-queue', {
+        body: { 
+          action: 'getPendingJobs', 
+          limit 
+        }
+      });
 
-    if (error) throw error;
-    return data || [];
+      if (error) throw error;
+      return data.jobs || [];
+    } catch (error) {
+      console.error('Failed to get pending jobs:', error);
+      return [];
+    }
   }
 
   static async retryJob(jobId: string): Promise<boolean> {
-    const job = await this.getJob(jobId);
-    
-    if (!job || job.attempts >= job.maxAttempts) {
-      await this.updateJobStatus(jobId, 'failed', 'Max retry attempts exceeded');
+    try {
+      const { data, error } = await supabase.functions.invoke('job-queue', {
+        body: { 
+          action: 'retryJob', 
+          jobId 
+        }
+      });
+
+      if (error) throw error;
+      return data.success || false;
+    } catch (error) {
+      console.error('Failed to retry job:', error);
       return false;
     }
-
-    await this.updateJobStatus(jobId, 'queued');
-    return true;
   }
 
   static async processWithRetry<T>(

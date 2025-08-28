@@ -14,9 +14,7 @@ export const testFormSchema = z.object({
         return false;
       }
     }, 'URL must use HTTP or HTTPS protocol'),
-  device: z.enum(['mobile', 'desktop'], {
-    required_error: 'Please select a device type'
-  }),
+  device: z.enum(['mobile', 'desktop']),
   region: z.string().min(1, 'Please select a region')
 });
 

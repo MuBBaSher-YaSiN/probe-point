@@ -9,6 +9,7 @@ import { WebVitalsChart } from '@/components/performance/WebVitalsChart';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { LogOut, History, Settings, BarChart3, Globe2, Zap } from 'lucide-react';
+import { TestFormData } from '@/schemas/validation';
 import { Link } from 'react-router-dom';
 
 interface TestRun {
@@ -61,43 +62,51 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleTestSubmit = async (formData: { url: string; device: string; region: string }) => {
+  const handleTestSubmit = async (formData: TestFormData) => {
     setTestLoading(true);
     try {
-      // Create a new test run with mock data for demo
-      const mockScores = {
-        performance_score: Math.floor(Math.random() * 40) + 60, // 60-100
-        seo_score: Math.floor(Math.random() * 30) + 70, // 70-100
-        accessibility_score: Math.floor(Math.random() * 20) + 80, // 80-100
-        best_practices_score: Math.floor(Math.random() * 25) + 75, // 75-100
-        first_contentful_paint: Math.floor(Math.random() * 2000) + 1000, // 1-3s
-        largest_contentful_paint: Math.floor(Math.random() * 3000) + 2000, // 2-5s
-        cumulative_layout_shift: Math.random() * 0.25, // 0-0.25
-        total_blocking_time: Math.floor(Math.random() * 300) + 50, // 50-350ms
-        time_to_interactive: Math.floor(Math.random() * 4000) + 2000, // 2-6s
-        total_requests: Math.floor(Math.random() * 50) + 30,
-        total_bytes: Math.floor(Math.random() * 2000000) + 1000000, // 1-3MB
-      };
-
-      const { data, error } = await supabase
-        .from('test_runs')
-        .insert({
-          user_id: user.id,
-          url: formData.url,
-          device: formData.device,
-          region: formData.region,
-          status: 'completed',
-          ...mockScores,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
+      // Use the real performance testing engine
+      const { PerformanceTestingEngine } = await import('@/lib/performance-testing');
+      const testRunId = await PerformanceTestingEngine.runTest(formData);
 
       toast({
-        title: 'Test Completed!',
-        description: `Performance test for ${formData.url} has been completed.`,
+        title: 'Test Started!',
+        description: `Performance test for ${formData.url} has been queued.`,
       });
+
+      // Poll for test completion
+      let completed = false;
+      let attempts = 0;
+      const maxAttempts = 30; // 30 seconds max wait
+      
+      while (!completed && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+        
+        const { data: testRun } = await supabase
+          .from('test_runs')
+          .select('status')
+          .eq('id', testRunId)
+          .single();
+
+        if (testRun?.status === 'completed' || testRun?.status === 'failed') {
+          completed = true;
+          
+          if (testRun.status === 'completed') {
+            toast({
+              title: 'Test Completed!',
+              description: `Performance test for ${formData.url} has been completed.`,
+            });
+          } else {
+            toast({
+              title: 'Test Failed',
+              description: 'Performance test failed to complete.',
+              variant: 'destructive',
+            });
+          }
+        }
+        
+        attempts++;
+      }
 
       // Reload recent tests
       await loadRecentTests();
@@ -105,7 +114,7 @@ const Dashboard: React.FC = () => {
       console.error('Error running test:', error);
       toast({
         title: 'Test Failed',
-        description: 'Failed to run performance test. Please try again.',
+        description: 'Failed to start performance test. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -190,16 +199,16 @@ const Dashboard: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" size="sm" className="hidden md:flex items-center gap-2">
+            <Button asChild variant="ghost" size="sm" className="flex items-center gap-2">
               <Link to="/history">
                 <History className="w-4 h-4" />
-                History
+                <span className="hidden md:inline">History</span>
               </Link>
             </Button>
-            <Button asChild variant="ghost" size="sm" className="hidden md:flex items-center gap-2">
-              <Link to="/profile">
+            <Button asChild variant="ghost" size="sm" className="flex items-center gap-2">
+              <Link to="/settings">
                 <Settings className="w-4 h-4" />
-                Settings
+                <span className="hidden md:inline">Settings</span>
               </Link>
             </Button>
             <Button 

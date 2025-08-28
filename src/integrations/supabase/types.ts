@@ -74,6 +74,42 @@ export type Database = {
         }
         Relationships: []
       }
+      jobs: {
+        Row: {
+          attempts: number
+          created_at: string
+          error: string | null
+          id: string
+          max_attempts: number
+          payload: Json
+          status: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          max_attempts?: number
+          payload?: Json
+          status?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          max_attempts?: number
+          payload?: Json
+          status?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -205,6 +241,7 @@ export type Database = {
           region: string | null
           seo_score: number | null
           site_id: string | null
+          speed_index: number | null
           started_at: string | null
           status: string | null
           time_to_interactive: number | null
@@ -232,6 +269,7 @@ export type Database = {
           region?: string | null
           seo_score?: number | null
           site_id?: string | null
+          speed_index?: number | null
           started_at?: string | null
           status?: string | null
           time_to_interactive?: number | null
@@ -259,6 +297,7 @@ export type Database = {
           region?: string | null
           seo_score?: number | null
           site_id?: string | null
+          speed_index?: number | null
           started_at?: string | null
           status?: string | null
           time_to_interactive?: number | null
