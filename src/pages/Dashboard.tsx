@@ -3,7 +3,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { PerformanceTestForm } from '@/components/performance/PerformanceTestForm';
+import PerformanceTestForm from '@/components/performance/PerformanceTestForm';
 import { PerformanceScoreCard } from '@/components/performance/PerformanceScoreCard';
 import { WebVitalsChart } from '@/components/performance/WebVitalsChart';
 import { supabase } from '@/integrations/supabase/client';

@@ -16,7 +16,7 @@ interface PerformanceTestFormProps {
   className?: string;
 }
 
-export const PerformanceTestForm: React.FC<PerformanceTestFormProps> = ({
+const PerformanceTestForm: React.FC<PerformanceTestFormProps> = ({
   onSubmit,
   loading = false,
   className = '',
@@ -136,3 +136,5 @@ export const PerformanceTestForm: React.FC<PerformanceTestFormProps> = ({
     </Card>
   );
 };
+
+export default PerformanceTestForm;

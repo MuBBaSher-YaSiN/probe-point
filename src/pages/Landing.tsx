@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { PerformanceTestForm } from '@/components/performance/PerformanceTestForm';
+import PerformanceTestForm from '@/components/performance/PerformanceTestForm';
 import { PerformanceScoreCard } from '@/components/performance/PerformanceScoreCard';
 import { WebVitalsChart } from '@/components/performance/WebVitalsChart';
 import { useAuth } from '@/components/auth/AuthProvider';
