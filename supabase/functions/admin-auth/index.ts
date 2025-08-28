@@ -10,7 +10,7 @@ const corsHeaders = {
 // File-based admin configuration
 const ADMIN_CONFIG = {
   EMAIL: Deno.env.get('ADMIN_EMAIL') ?? "iqraf2001@gmail.com",
-  PASSWORD_HASH: Deno.env.get('ADMIN_PASSWORD_HASH') ?? "$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", // Default: "password"
+  PASSWORD_HASH: Deno.env.get('ADMIN_PASSWORD_HASH') ?? "$2a$12$Jjj6wFVyMoYNWIT1qvcIOOpfOFRXFDfGRNcSabdHHaiM8NWZjfM5q", // Default: "password"
 };
 
 async function validateAdminCredentials(email: string, password: string): Promise<boolean> {
