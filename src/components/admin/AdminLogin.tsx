@@ -45,7 +45,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, loading = fal
       if (data.success) {
         // Now sign in the user through Supabase auth using a special admin account
         const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: 'admin@probe-point.app',
+          email: 'iqraf2001@gmail.com',
           password: 'probepoint2025'
         });
 
