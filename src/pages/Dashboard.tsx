@@ -9,6 +9,7 @@ import { WebVitalsChart } from '@/components/performance/WebVitalsChart';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { LogOut, History, Settings, BarChart3, Globe2, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface TestRun {
   id: string;
@@ -189,13 +190,17 @@ const Dashboard: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="hidden md:flex items-center gap-2">
-              <History className="w-4 h-4" />
-              History
+            <Button asChild variant="ghost" size="sm" className="hidden md:flex items-center gap-2">
+              <Link to="/history">
+                <History className="w-4 h-4" />
+                History
+              </Link>
             </Button>
-            <Button variant="ghost" size="sm" className="hidden md:flex items-center gap-2">
-              <Settings className="w-4 h-4" />
-              Settings
+            <Button asChild variant="ghost" size="sm" className="hidden md:flex items-center gap-2">
+              <Link to="/profile">
+                <Settings className="w-4 h-4" />
+                Settings
+              </Link>
             </Button>
             <Button 
               variant="outline" 
