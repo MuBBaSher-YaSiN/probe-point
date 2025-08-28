@@ -17,7 +17,7 @@
 
 export const ADMIN = {
   EMAIL: process.env.ADMIN_EMAIL ?? "iqraf2001@gmail.com",
-  PASSWORD_HASH: process.env.ADMIN_PASSWORD_HASH ?? "$2a$12$Jjj6wFVyMoYNWIT1qvcIOOpfOFRXFDfGRNcSabdHHaiM8NWZjfM5q", // Default: "password"
+  PASSWORD_HASH: process.env.ADMIN_PASSWORD_HASH ?? "$2a$10$2iduKnlMUlyrzmK0gas3AuERHsd4yBfZGw4BnPYWl.qc4deAo1l9O", // Default: "password"
 } as const;
 
 /**
