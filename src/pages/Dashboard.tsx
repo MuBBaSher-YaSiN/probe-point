@@ -36,21 +36,6 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [testLoading, setTestLoading] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      loadRecentTests();
-    }
-  }, [user]);
-
-  // Redirect admin users to admin dashboard
-  if (userRole === 'admin') {
-    return <Navigate to="/admin" replace />;
-  }
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
   const loadRecentTests = async () => {
     setLoading(true);
     try {
@@ -68,6 +53,21 @@ const Dashboard: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      loadRecentTests();
+    }
+  }, [user]);
+
+  // Redirect admin users to admin dashboard
+  if (userRole === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
 
   const handleTestSubmit = async (formData: TestFormData) => {
     setTestLoading(true);
