@@ -292,9 +292,9 @@ const Profile: React.FC = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm">
-              <Link to="/dashboard" className="flex items-center gap-2">
+              <Link to="/" className="flex items-center gap-2">
                 <ArrowLeft className="w-4 h-4" />
-                Back to Dashboard
+                Back to Home
               </Link>
             </Button>
             <div className="flex items-center gap-2">

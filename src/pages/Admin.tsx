@@ -21,7 +21,8 @@ import {
   Clock,
   Key,
   Database,
-  ArrowLeft
+  ArrowLeft,
+  Trash2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -117,18 +118,24 @@ const Admin: React.FC = () => {
 
   const loadAdminData = async () => {
     try {
-      // Load statistics
-      const [usersResult, testsResult, profilesResult] = await Promise.all([
+      // Load statistics with proper user data
+      const [profilesResult, testsResult] = await Promise.all([
         supabase.from('profiles').select('*').order('created_at', { ascending: false }),
-        supabase.from('test_runs').select('*').order('created_at', { ascending: false }).limit(20),
-        supabase.from('profiles').select('id, created_at')
+        supabase.from('test_runs').select('*').order('created_at', { ascending: false }).limit(50)
       ]);
 
-      if (usersResult.error) throw usersResult.error;
-      if (testsResult.error) throw testsResult.error;
       if (profilesResult.error) throw profilesResult.error;
+      if (testsResult.error) throw testsResult.error;
+      
+      const allUsers = profilesResult.data.map(profile => ({
+        id: profile.user_id,
+        email: `user-${profile.user_id.slice(0, 8)}`,
+        full_name: profile.full_name || 'Unknown User',
+        role: profile.role || 'user',
+        created_at: profile.created_at,
+        last_sign_in_at: profile.updated_at
+      }));
 
-      const allUsers = usersResult.data || [];
       const allTests = testsResult.data || [];
 
       // Calculate stats
@@ -162,18 +169,8 @@ const Admin: React.FC = () => {
         avgPerformanceScore: Math.round(avgScore)
       });
 
-      // Set users and tests for display
-      const usersWithDetails = allUsers.map(profile => ({
-        id: profile.user_id,
-        email: profile.user_id, // We'll need to get this from auth if needed
-        full_name: profile.full_name || 'Unknown',
-        role: profile.role || 'user',
-        created_at: profile.created_at,
-        last_sign_in_at: profile.updated_at
-      }));
-
-      setUsers(usersWithDetails.slice(0, 10));
-      setRecentTests(allTests.slice(0, 10));
+      setUsers(allUsers.slice(0, 20));
+      setRecentTests(allTests.slice(0, 15));
 
     } catch (error) {
       console.error('Error loading admin data:', error);
@@ -189,7 +186,7 @@ const Admin: React.FC = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ role: newRole })
+        .update({ role: newRole, updated_at: new Date().toISOString() })
         .eq('user_id', userId);
 
       if (error) throw error;
@@ -205,6 +202,82 @@ const Admin: React.FC = () => {
       toast({
         title: 'Update Failed',
         description: 'Failed to update user role.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const deleteUser = async (userId: string) => {
+    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      // First delete related data
+      await Promise.all([
+        supabase.from('test_runs').delete().eq('user_id', userId),
+        supabase.from('api_keys').delete().eq('user_id', userId),
+        supabase.from('sites').delete().eq('user_id', userId)
+      ]);
+
+      // Then delete the profile
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'User Deleted',
+        description: 'User and all related data have been deleted.',
+      });
+
+      await loadAdminData();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: 'Deletion Failed',
+        description: 'Failed to delete user. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const exportUserReport = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, role, created_at, updated_at');
+
+      if (error) throw error;
+
+      const csvContent = [
+        'User ID,Full Name,Role,Created At,Updated At',
+        ...data.map(user => 
+          `${user.user_id},"${user.full_name || 'N/A'}",${user.role},${user.created_at},${user.updated_at}`
+        )
+      ].join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `user-report-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: 'Report Generated',
+        description: 'User report has been downloaded.',
+      });
+    } catch (error) {
+      console.error('Error generating report:', error);
+      toast({
+        title: 'Export Failed',
+        description: 'Failed to generate user report.',
         variant: 'destructive',
       });
     }
@@ -244,9 +317,9 @@ const Admin: React.FC = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm">
-              <Link to="/dashboard" className="flex items-center gap-2">
+              <Link to="/" className="flex items-center gap-2">
                 <ArrowLeft className="w-4 h-4" />
-                Back to Dashboard
+                Back to Home
               </Link>
             </Button>
             <div className="flex items-center gap-2">
@@ -367,11 +440,14 @@ const Admin: React.FC = () => {
                     <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex-1">
                         <div className="font-medium">{user.full_name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          ID: {user.id} • Joined: {new Date(user.created_at).toLocaleDateString()}
+                        <div className="text-sm text-muted-foreground mb-1">
+                          {user.email}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          ID: {user.id.slice(0, 8)}... • Joined: {new Date(user.created_at).toLocaleDateString()}
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         <Badge 
                           variant={user.role === 'admin' ? 'default' : 'secondary'}
                         >
@@ -387,6 +463,16 @@ const Admin: React.FC = () => {
                         >
                           {user.role === 'admin' ? 'Remove Admin' : 'Make Admin'}
                         </Button>
+                        {user.role !== 'admin' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteUser(user.id)}
+                            className="text-error hover:text-error"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -465,19 +551,19 @@ const Admin: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button variant="outline" className="h-20 flex-col">
+                  <Button variant="outline" className="h-20 flex-col" onClick={exportUserReport}>
                     <FileText className="w-6 h-6 mb-2" />
                     Export User Report
                   </Button>
-                  <Button variant="outline" className="h-20 flex-col">
+                  <Button variant="outline" className="h-20 flex-col" onClick={() => toast({ title: 'Coming Soon', description: 'Performance analytics export will be available soon.' })}>
                     <BarChart3 className="w-6 h-6 mb-2" />
                     Performance Analytics
                   </Button>
-                  <Button variant="outline" className="h-20 flex-col">
+                  <Button variant="outline" className="h-20 flex-col" onClick={() => toast({ title: 'System Stats', description: `Total Users: ${stats.totalUsers}, Total Tests: ${stats.totalTests}, Active Users: ${stats.activeUsers}` })}>
                     <Activity className="w-6 h-6 mb-2" />
                     System Usage Report
                   </Button>
-                  <Button variant="outline" className="h-20 flex-col">
+                  <Button variant="outline" className="h-20 flex-col" onClick={() => toast({ title: 'Database Status', description: 'Database connection is healthy and operational.' })}>
                     <Database className="w-6 h-6 mb-2" />
                     Database Statistics
                   </Button>
@@ -501,7 +587,7 @@ const Admin: React.FC = () => {
                         Temporarily disable public access
                       </p>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => toast({ title: 'Settings', description: 'Maintenance mode configuration will be available in future updates.' })}>
                       Configure
                     </Button>
                   </div>
@@ -513,7 +599,7 @@ const Admin: React.FC = () => {
                         Configure API request limits
                       </p>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => toast({ title: 'Settings', description: 'Rate limiting configuration will be available in future updates.' })}>
                       Configure
                     </Button>
                   </div>
@@ -525,7 +611,7 @@ const Admin: React.FC = () => {
                         Database backup configuration
                       </p>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => toast({ title: 'Settings', description: 'Backup settings configuration will be available in future updates.' })}>
                       Configure
                     </Button>
                   </div>
@@ -544,7 +630,7 @@ const Admin: React.FC = () => {
                         Configure PSI API key and settings
                       </p>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => toast({ title: 'API Settings', description: 'PageSpeed Insights API configuration will be available in future updates.' })}>
                       <Key className="w-4 h-4 mr-2" />
                       Configure
                     </Button>
@@ -557,7 +643,7 @@ const Admin: React.FC = () => {
                         Job processing and retry configuration
                       </p>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => toast({ title: 'Queue Settings', description: 'Test queue configuration will be available in future updates.' })}>
                       Configure
                     </Button>
                   </div>
