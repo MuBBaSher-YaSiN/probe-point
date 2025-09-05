@@ -22,7 +22,8 @@ import {
   Key,
   Database,
   ArrowLeft,
-  Trash2
+  Trash2,
+  LogOut
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -54,7 +55,7 @@ interface TestRun {
 }
 
 const Admin: React.FC = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<AdminStats>({
@@ -141,35 +142,31 @@ const Admin: React.FC = () => {
 
       const allTests = testsResult.data || [];
 
-      // Calculate stats
-      const today = new Date().toDateString();
-      const testsToday = allTests.filter(test => 
-        new Date(test.created_at).toDateString() === today
-      ).length;
+      // Calculate stats with real data
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const testsToday = allTests.filter(test => {
+        const testDate = new Date(test.created_at);
+        return testDate >= today && testDate < tomorrow;
+      }).length;
 
       const completedTests = allTests.filter(test => 
-        test.performance_score && test.status === 'completed'
+        test.performance_score !== null && test.status === 'completed'
       );
-      const avgScore = completedTests.length > 0 
-        ? completedTests.reduce((sum, test) => sum + (test.performance_score || 0), 0) / completedTests.length
-        : 0;
-
-      // Active users (users with activity in last 30 days)
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       
-      const activeUserIds = new Set(
-        allTests
-          .filter(test => new Date(test.created_at) > thirtyDaysAgo)
-          .map(test => test.user_id)
-      );
+      const avgScore = completedTests.length > 0 
+        ? Math.round(completedTests.reduce((sum, test) => sum + (test.performance_score || 0), 0) / completedTests.length)
+        : 0;
 
       setStats({
         totalUsers: allUsers.length,
         totalTests: allTests.length,
         testsToday,
-        activeUsers: activeUserIds.size,
-        avgPerformanceScore: Math.round(avgScore)
+        activeUsers: 0, // Will be removed from UI
+        avgPerformanceScore: avgScore
       });
 
       setUsers(allUsers.slice(0, 20));
@@ -330,15 +327,32 @@ const Admin: React.FC = () => {
               <h1 className="text-2xl font-bold gradient-text">Admin Dashboard</h1>
             </div>
           </div>
-          <Badge variant="default" className="bg-primary/10 text-primary">
-            Administrator
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="default" className="bg-primary/10 text-primary">
+              Administrator
+            </Badge>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={async () => {
+                await signOut();
+                toast({
+                  title: 'Signed Out',
+                  description: 'You have been successfully signed out.',
+                });
+              }}
+              className="flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="score-card">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
@@ -348,20 +362,6 @@ const Admin: React.FC = () => {
                 <div>
                   <div className="text-2xl font-bold">{stats.totalUsers}</div>
                   <p className="text-sm text-muted-foreground">Total Users</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="score-card">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-full bg-success/10">
-                  <Activity className="w-6 h-6 text-success" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{stats.activeUsers}</div>
-                  <p className="text-sm text-muted-foreground">Active Users</p>
                 </div>
               </div>
             </CardContent>
