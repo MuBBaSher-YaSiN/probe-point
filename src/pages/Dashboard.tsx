@@ -30,7 +30,7 @@ interface TestRun {
 }
 
 const Dashboard: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { user, userRole, signOut } = useAuth();
   const { toast } = useToast();
   const [recentTests, setRecentTests] = useState<TestRun[]>([]);
   const [loading, setLoading] = useState(false);
@@ -41,6 +41,11 @@ const Dashboard: React.FC = () => {
       loadRecentTests();
     }
   }, [user]);
+
+  // Redirect admin users to admin dashboard
+  if (userRole === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
 
   if (!user) {
     return <Navigate to="/auth" replace />;
