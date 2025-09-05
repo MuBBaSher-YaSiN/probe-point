@@ -98,7 +98,7 @@ const Admin: React.FC = () => {
 
       // Check for admin role or specific admin email (file-based admin)
       const hasAdminRole = profile?.role === 'admin';
-      const isFileBasedAdmin = user.email === 'iqraf2001@gmail.com';
+      const isFileBasedAdmin = user.email === 'admin@probe-point.app';
       
       setIsAdmin(hasAdminRole || isFileBasedAdmin);
       
