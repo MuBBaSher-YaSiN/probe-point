@@ -43,7 +43,7 @@ interface ApiKey {
 }
 
 const Profile: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { user, userRole, signOut } = useAuth();
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
@@ -57,16 +57,21 @@ const Profile: React.FC = () => {
   const [showNewApiKey, setShowNewApiKey] = useState(false);
   const [generatedApiKey, setGeneratedApiKey] = useState('');
 
+  // Redirect admin users to admin dashboard  
+  if (userRole === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
   useEffect(() => {
     if (user) {
       loadProfile();
       loadApiKeys();
     }
   }, [user]);
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
 
   const loadProfile = async () => {
     try {
