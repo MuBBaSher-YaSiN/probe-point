@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 const PSI_API_KEY = Deno.env.get('PAGESPEED_API_KEY') || 'AIzaSyBOTI0m-B7X0bcIntWqYswE9fzplZi-lOg';
-const PSI_URL = 'https://www.googleapis.com/pagespeedinghts/v5/runPagespeed';
+const PSI_URL = 'https://www.googleapis.com/pagespeedinsights/v5/runPagespeed';
 
 async function getPageSpeedInsights(url: string, strategy: 'mobile' | 'desktop') {
   const apiUrl = new URL(PSI_URL);
