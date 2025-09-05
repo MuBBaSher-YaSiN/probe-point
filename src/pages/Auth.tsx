@@ -35,7 +35,21 @@ const Auth: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState('signin');
+  const { user, loading } = useAuth();
 
+// fire once when we've finished loading and discovered no user
+useEffect(() => {
+  if (!loading && !user) {
+    toast({
+      title: 'Sign-in required',
+      description: 'Please log in to continue.',
+      variant: 'destructive',
+    });
+  }
+}, [loading, user, toast]);
+
+if (loading) return null;                   // or a spinner
+if (!user) return <Navigate to="/auth" replace />;
   const signInForm = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
   });
