@@ -62,6 +62,15 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, loading = fal
                 }
               }
             });
+
+            if (!signUpError) {
+              // Create admin profile immediately after signup
+              await supabase.from('profiles').insert({
+                user_id: (await supabase.auth.getUser()).data.user?.id,
+                full_name: 'System Administrator',
+                role: 'admin'
+              });
+            }
             
             if (signUpError) {
               throw new Error('Failed to create admin account: ' + signUpError.message);
