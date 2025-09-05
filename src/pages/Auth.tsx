@@ -30,7 +30,7 @@ type SignInFormData = z.infer<typeof signInSchema>;
 type SignUpFormData = z.infer<typeof signUpSchema>;
 
 const Auth: React.FC = () => {
-  const { user, signIn, signUp } = useAuth();
+  const { user, userRole, signIn, signUp } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -44,9 +44,10 @@ const Auth: React.FC = () => {
     resolver: zodResolver(signUpSchema),
   });
 
-  // Redirect if already authenticated
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
+  // Redirect if already authenticated based on role
+  if (user && userRole) {
+    const redirectPath = userRole === 'admin' ? '/admin' : '/dashboard';
+    return <Navigate to={redirectPath} replace />;
   }
 
   const handleSignIn = async (data: SignInFormData) => {

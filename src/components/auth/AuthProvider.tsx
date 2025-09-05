@@ -6,6 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  userRole: string | null;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -25,6 +26,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  // Fetch user profile and role
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+      
+      setUserRole(profile?.role || 'user');
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      setUserRole('user');
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener
@@ -33,16 +51,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Create profile if user signs up
-        if (event === 'SIGNED_IN' && session?.user) {
-          setTimeout(async () => {
-            await supabase
-              .from('profiles')
-              .insert({
-                user_id: session.user.id,
-                full_name: session.user.user_metadata?.full_name,
-              });
+        if (session?.user) {
+          // Fetch user role
+          setTimeout(() => {
+            fetchUserProfile(session.user.id);
           }, 0);
+          
+          // Create profile if user signs up
+          if (event === 'SIGNED_IN') {
+            setTimeout(async () => {
+              // Check if profile already exists
+              const { data: existingProfile } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('user_id', session.user.id)
+                .single();
+              
+              // Only create profile if it doesn't exist
+              if (!existingProfile) {
+                await supabase
+                  .from('profiles')
+                  .insert({
+                    user_id: session.user.id,
+                    full_name: session.user.user_metadata?.full_name,
+                  });
+              }
+            }, 0);
+          }
+        } else {
+          setUserRole(null);
         }
         
         setLoading(false);
@@ -53,6 +90,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      }
       setLoading(false);
     });
 
@@ -91,6 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     loading,
+    userRole,
     signIn,
     signUp,
     signOut,
