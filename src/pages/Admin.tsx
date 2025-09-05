@@ -335,11 +335,22 @@ const Admin: React.FC = () => {
               variant="outline" 
               size="sm" 
               onClick={async () => {
-                await signOut();
-                toast({
-                  title: 'Signed Out',
-                  description: 'You have been successfully signed out.',
-                });
+                try {
+                  await signOut();
+                  toast({
+                    title: 'Signed Out',
+                    description: 'You have been successfully signed out.',
+                  });
+                  // Force redirect to landing page
+                  window.location.href = '/';
+                } catch (error) {
+                  console.error('Sign out error:', error);
+                  toast({
+                    title: 'Sign Out Failed',
+                    description: 'There was an error signing out. Please try again.',
+                    variant: 'destructive',
+                  });
+                }
               }}
               className="flex items-center gap-2"
             >
