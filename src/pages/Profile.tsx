@@ -56,20 +56,22 @@ const Profile: React.FC = () => {
   const [newApiKeyLabel, setNewApiKeyLabel] = useState('');
   const [showNewApiKey, setShowNewApiKey] = useState(false);
   const [generatedApiKey, setGeneratedApiKey] = useState('');
-    useEffect(() => {
+
+  // Redirect admin users to admin dashboard  
+  if (userRole === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  useEffect(() => {
     if (user) {
       loadProfile();
       loadApiKeys();
     }
   }, [user]);
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-    // Redirect admin users to admin dashboard  
-  if (userRole === 'admin') {
-    return <Navigate to="/admin" replace />;
-  }
 
   const loadProfile = async () => {
     try {
