@@ -59,10 +59,6 @@ const History: React.FC = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  useEffect(() => {
-    loadTests();
-  }, [currentPage, searchUrl, deviceFilter, statusFilter]);
-
   const loadTests = async () => {
     setLoading(true);
     try {
@@ -100,6 +96,10 @@ const History: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadTests();
+  }, [currentPage, searchUrl, deviceFilter, statusFilter]);
 
   const getScoreColor = (score: number | null) => {
     if (!score) return 'bg-muted text-muted-foreground';

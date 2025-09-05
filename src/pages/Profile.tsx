@@ -56,21 +56,7 @@ const Profile: React.FC = () => {
   const [newApiKeyLabel, setNewApiKeyLabel] = useState('');
   const [showNewApiKey, setShowNewApiKey] = useState(false);
   const [generatedApiKey, setGeneratedApiKey] = useState('');
-    useEffect(() => {
-    if (user) {
-      loadProfile();
-      loadApiKeys();
-    }
-  }, [user]);
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-    // Redirect admin users to admin dashboard  
-  if (userRole === 'admin') {
-    return <Navigate to="/admin" replace />;
-  }
-
+  
   const loadProfile = async () => {
     try {
       const { data, error } = await supabase
@@ -113,6 +99,21 @@ const Profile: React.FC = () => {
       console.error('Error loading API keys:', error);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      loadProfile();
+      loadApiKeys();
+    }
+  }, [user]);
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+     // Redirect admin users to admin dashboard  
+  if (userRole === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
 
   const updateProfile = async () => {
     setUpdating(true);
