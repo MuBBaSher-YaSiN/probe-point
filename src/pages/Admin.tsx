@@ -68,12 +68,10 @@ const Admin: React.FC = () => {
   const [recentTests, setRecentTests] = useState<TestRun[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
   useEffect(() => {
-    checkAdminAccess();
+    if (user) {
+      checkAdminAccess();
+    }
   }, [user]);
 
   useEffect(() => {
@@ -81,6 +79,11 @@ const Admin: React.FC = () => {
       loadAdminData();
     }
   }, [isAdmin]);
+
+  // Early return after all hooks are declared
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
 
   const checkAdminAccess = async () => {
     try {
