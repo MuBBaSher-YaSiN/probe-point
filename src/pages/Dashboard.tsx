@@ -234,7 +234,7 @@ const Dashboard: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8 animate-fade-in-up">
-          <h2 className="text-3xl font-bold mb-2">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2">
             Welcome back, {user.user_metadata?.full_name || user.email}!
           </h2>
           <p className="text-muted-foreground">
@@ -243,7 +243,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
           <Card className="score-card animate-scale-in">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
@@ -335,40 +335,40 @@ const Dashboard: React.FC = () => {
 
         {/* Recent Tests */}
         {recentTests.length > 0 && (
-          <div className="mt-12 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-            <h3 className="text-xl font-semibold mb-4">Recent Tests</h3>
-            <Card className="score-card">
-              <CardContent className="p-0">
-                <div className="divide-y">
-                  {recentTests.map((test, index) => (
-                    <div key={test.id} className="p-4 hover:bg-muted/50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium">{test.url}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {test.device} • {new Date(test.created_at).toLocaleDateString()}
+            <div className="mt-12 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+              <h3 className="text-xl font-semibold mb-4">Recent Tests</h3>
+              <Card className="score-card">
+                <CardContent className="p-0">
+                  <div className="divide-y">
+                    {recentTests.map((test, index) => (
+                      <div key={test.id} className="p-4 hover:bg-muted/50 transition-colors">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium truncate">{test.url}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {test.device} • {new Date(test.created_at).toLocaleDateString()}
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="text-right">
-                            <div className="font-semibold">{test.performance_score}</div>
-                            <div className="text-xs text-muted-foreground">Performance</div>
-                          </div>
-                          <div className={`px-2 py-1 rounded text-xs font-medium ${
-                            test.status === 'completed' ? 'bg-success/10 text-success' : 
-                            test.status === 'running' ? 'bg-warning/10 text-warning' :
-                            'bg-muted text-muted-foreground'
-                          }`}>
-                            {test.status}
+                          <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+                            <div className="text-right">
+                              <div className="font-semibold">{test.performance_score}</div>
+                              <div className="text-xs text-muted-foreground">Performance</div>
+                            </div>
+                            <div className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
+                              test.status === 'completed' ? 'bg-success/10 text-success' : 
+                              test.status === 'running' ? 'bg-warning/10 text-warning' :
+                              'bg-muted text-muted-foreground'
+                            }`}>
+                              {test.status}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
         )}
       </div>
     </div>

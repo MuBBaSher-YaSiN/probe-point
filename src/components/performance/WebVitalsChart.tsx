@@ -76,14 +76,15 @@ export const WebVitalsChart: React.FC<WebVitalsChartProps> = ({
           </BarChart>
         </ResponsiveContainer>
         
-        <div className="grid grid-cols-3 gap-4 mt-4 text-center text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 text-center text-sm">
           <div className="flex items-center justify-center gap-2">
             <div className="w-3 h-3 rounded-full bg-success"></div>
             <span>Good</span>
           </div>
           <div className="flex items-center justify-center gap-2">
             <div className="w-3 h-3 rounded-full bg-warning"></div>
-            <span>Needs Improvement</span>
+            <span className="hidden xs:inline">Needs Improvement</span>
+            <span className="xs:hidden">Needs Work</span>
           </div>
           <div className="flex items-center justify-center gap-2">
             <div className="w-3 h-3 rounded-full bg-error"></div>

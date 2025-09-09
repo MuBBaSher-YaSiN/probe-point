@@ -73,7 +73,7 @@ const PerformanceTestForm: React.FC<PerformanceTestFormProps> = ({
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Device</Label>
               <div className="grid grid-cols-2 gap-2">
@@ -81,19 +81,21 @@ const PerformanceTestForm: React.FC<PerformanceTestFormProps> = ({
                   type="button"
                   variant={selectedDevice === 'mobile' ? 'default' : 'outline'}
                   onClick={() => setValue('device', 'mobile')}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 text-sm"
                 >
                   <Smartphone className="w-4 h-4" />
-                  Mobile
+                  <span className="hidden xs:inline">Mobile</span>
+                  <span className="xs:hidden">M</span>
                 </Button>
                 <Button
                   type="button"
                   variant={selectedDevice === 'desktop' ? 'default' : 'outline'}
                   onClick={() => setValue('device', 'desktop')}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 text-sm"
                 >
                   <Monitor className="w-4 h-4" />
-                  Desktop
+                  <span className="hidden xs:inline">Desktop</span>
+                  <span className="xs:hidden">D</span>
                 </Button>
               </div>
             </div>

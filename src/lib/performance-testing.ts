@@ -25,7 +25,7 @@ export interface TestRequest {
 
 export class PerformanceTestingEngine {
   private static readonly API_KEY = 'AIzaSyBOTI0m-B7X0bcIntWqYswE9fzplZi-lOg'; // Demo API key
-  private static readonly PSI_URL = 'https://www.googleapis.com/pagespeedinights/v5/runPagespeed';
+  private static readonly PSI_URL = 'https://www.googleapis.com/pagespeedinsights/v5/runPagespeed';
 
   static async runTest(request: TestRequest): Promise<string> {
     try {
