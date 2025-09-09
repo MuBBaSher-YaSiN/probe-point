@@ -7,10 +7,23 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const PSI_API_KEY = Deno.env.get('PAGESPEED_API_KEY') || 'AIzaSyBOTI0m-B7X0bcIntWqYswE9fzplZi-lOg';
+const PSI_API_KEY = Deno.env.get('PAGESPEED_API_KEY');
 const PSI_URL = 'https://www.googleapis.com/pagespeedinsights/v5/runPagespeed';
 
 async function getPageSpeedInsights(url: string, strategy: 'mobile' | 'desktop') {
+  console.log(`Testing URL: ${url} with strategy: ${strategy}`);
+  
+  if (!PSI_API_KEY) {
+    throw new Error('PageSpeed Insights API key not configured');
+  }
+
+  // Validate URL format
+  try {
+    new URL(url);
+  } catch (e) {
+    throw new Error(`Invalid URL format: ${url}`);
+  }
+
   const apiUrl = new URL(PSI_URL);
   apiUrl.searchParams.set('url', url);
   apiUrl.searchParams.set('key', PSI_API_KEY);
@@ -20,13 +33,21 @@ async function getPageSpeedInsights(url: string, strategy: 'mobile' | 'desktop')
   apiUrl.searchParams.set('category', 'best-practices');
   apiUrl.searchParams.set('category', 'seo');
 
+  console.log(`Making request to PageSpeed Insights API for: ${url}`);
+  
   const response = await fetch(apiUrl.toString());
   
+  console.log(`PageSpeed API response status: ${response.status}`);
+  
   if (!response.ok) {
-    throw new Error(`PageSpeed Insights API error: ${response.statusText}`);
+    const errorText = await response.text();
+    console.error(`PageSpeed API error: ${response.status} - ${errorText}`);
+    throw new Error(`PageSpeed Insights API error: ${response.statusText} (${response.status})`);
   }
 
-  return await response.json();
+  const data = await response.json();
+  console.log(`PageSpeed test completed successfully for: ${url}`);
+  return data;
 }
 
 serve(async (req) => {

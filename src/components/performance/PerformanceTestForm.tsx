@@ -73,7 +73,7 @@ const PerformanceTestForm: React.FC<PerformanceTestFormProps> = ({
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div className="space-y-2">
               <Label>Device</Label>
               <div className="grid grid-cols-2 gap-2">
@@ -81,21 +81,21 @@ const PerformanceTestForm: React.FC<PerformanceTestFormProps> = ({
                   type="button"
                   variant={selectedDevice === 'mobile' ? 'default' : 'outline'}
                   onClick={() => setValue('device', 'mobile')}
-                  className="flex items-center gap-2 text-sm"
+                  className="flex items-center justify-center gap-2 text-sm min-h-[40px] px-3"
                 >
-                  <Smartphone className="w-4 h-4" />
-                  <span className="hidden xs:inline">Mobile</span>
-                  <span className="xs:hidden">M</span>
+                  <Smartphone className="w-4 h-4 flex-shrink-0" />
+                  <span className="hidden sm:inline whitespace-nowrap">Mobile</span>
+                  <span className="sm:hidden">M</span>
                 </Button>
                 <Button
                   type="button"
                   variant={selectedDevice === 'desktop' ? 'default' : 'outline'}
                   onClick={() => setValue('device', 'desktop')}
-                  className="flex items-center gap-2 text-sm"
+                  className="flex items-center justify-center gap-2 text-sm min-h-[40px] px-3"
                 >
-                  <Monitor className="w-4 h-4" />
-                  <span className="hidden xs:inline">Desktop</span>
-                  <span className="xs:hidden">D</span>
+                  <Monitor className="w-4 h-4 flex-shrink-0" />
+                  <span className="hidden sm:inline whitespace-nowrap">Desktop</span>
+                  <span className="sm:hidden">D</span>
                 </Button>
               </div>
             </div>
@@ -103,7 +103,7 @@ const PerformanceTestForm: React.FC<PerformanceTestFormProps> = ({
             <div className="space-y-2">
               <Label htmlFor="region">Region</Label>
               <Select onValueChange={(value) => setValue('region', value)} defaultValue="us">
-                <SelectTrigger>
+                <SelectTrigger className="w-full min-h-[40px]">
                   <SelectValue placeholder="Select region" />
                 </SelectTrigger>
                 <SelectContent>
