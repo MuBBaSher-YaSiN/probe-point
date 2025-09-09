@@ -8,46 +8,27 @@ const corsHeaders = {
 };
 
 const PSI_API_KEY = Deno.env.get('PAGESPEED_API_KEY');
-const PSI_URL = 'https://www.googleapis.com/pagespeedinsights/v5/runPagespeed';
+if (!PSI_API_KEY) {
+  throw new Error('Missing PAGESPEED_API_KEY secret');
+}
+
+const PSI_URL = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 
 async function getPageSpeedInsights(url: string, strategy: 'mobile' | 'desktop') {
-  console.log(`Testing URL: ${url} with strategy: ${strategy}`);
-  
-  if (!PSI_API_KEY) {
-    throw new Error('PageSpeed Insights API key not configured');
-  }
-
-  // Validate URL format
-  try {
-    new URL(url);
-  } catch (e) {
-    throw new Error(`Invalid URL format: ${url}`);
-  }
-
   const apiUrl = new URL(PSI_URL);
   apiUrl.searchParams.set('url', url);
   apiUrl.searchParams.set('key', PSI_API_KEY);
   apiUrl.searchParams.set('strategy', strategy);
-  apiUrl.searchParams.set('category', 'performance');
-  apiUrl.searchParams.set('category', 'accessibility');
-  apiUrl.searchParams.set('category', 'best-practices');
-  apiUrl.searchParams.set('category', 'seo');
-
-  console.log(`Making request to PageSpeed Insights API for: ${url}`);
-  
-  const response = await fetch(apiUrl.toString());
-  
-  console.log(`PageSpeed API response status: ${response.status}`);
-  
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`PageSpeed API error: ${response.status} - ${errorText}`);
-    throw new Error(`PageSpeed Insights API error: ${response.statusText} (${response.status})`);
+  for (const c of ['performance','accessibility','best-practices','seo']) {
+    apiUrl.searchParams.append('category', c);
   }
 
-  const data = await response.json();
-  console.log(`PageSpeed test completed successfully for: ${url}`);
-  return data;
+  const res = await fetch(apiUrl.toString());
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`PageSpeed Insights API error: ${res.status} ${res.statusText} - ${body}`);
+  }
+  return await res.json();
 }
 
 serve(async (req) => {

@@ -76,26 +76,24 @@ const PerformanceTestForm: React.FC<PerformanceTestFormProps> = ({
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Device</Label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   type="button"
                   variant={selectedDevice === 'mobile' ? 'default' : 'outline'}
                   onClick={() => setValue('device', 'mobile')}
-                  className="flex items-center justify-center gap-2 text-sm min-h-[40px] px-3"
+                  className="flex items-center justify-center gap-2 text-sm min-h-[40px] px-3 flex-1 min-w-[120px]"
                 >
                   <Smartphone className="w-4 h-4 flex-shrink-0" />
-                  <span className="hidden sm:inline whitespace-nowrap">Mobile</span>
-                  <span className="sm:hidden">M</span>
+                  <span className="whitespace-nowrap">Mobile</span>
                 </Button>
                 <Button
                   type="button"
                   variant={selectedDevice === 'desktop' ? 'default' : 'outline'}
                   onClick={() => setValue('device', 'desktop')}
-                  className="flex items-center justify-center gap-2 text-sm min-h-[40px] px-3"
+                  className="flex items-center justify-center gap-2 text-sm min-h-[40px] px-3 flex-1 min-w-[120px]"
                 >
                   <Monitor className="w-4 h-4 flex-shrink-0" />
-                  <span className="hidden sm:inline whitespace-nowrap">Desktop</span>
-                  <span className="sm:hidden">D</span>
+                  <span className="whitespace-nowrap">Desktop</span>
                 </Button>
               </div>
             </div>
